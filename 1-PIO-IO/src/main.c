@@ -166,7 +166,7 @@ int main(void) {
 		
 		if (pio_get(PIOD, PIO_INPUT, BUT_PIO1_IDX_MASK)!=1){
 			int i = 0;
-			while (i < 3){
+			while (i < 5){
 				pio_set(PIOA, OLED_PIO1_IDX_MASK);      // Coloca 1 no pino LED
 				delay_ms(200);                        // Delay por software de 200 ms
 				pio_clear(PIOA, OLED_PIO1_IDX_MASK);    // Coloca 0 no pino do LED
@@ -177,7 +177,7 @@ int main(void) {
 		
 		if (pio_get(PIOC, PIO_INPUT, BUT_PIO2_IDX_MASK)!=1){
 			int i = 0;
-			while (i < 3){
+			while (i < 5){
 				pio_set(PIOC, OLED_PIO2_IDX_MASK);      // Coloca 1 no pino LED
 				delay_ms(200);                        // Delay por software de 200 ms
 				pio_clear(PIOC, OLED_PIO2_IDX_MASK);    // Coloca 0 no pino do LED
@@ -187,7 +187,7 @@ int main(void) {
 		}
 		if (pio_get(PIOA, PIO_INPUT, BUT_PIO3_IDX_MASK)!=1){
 			int i = 0;
-			while (i < 3){
+			while (i < 5){
 				pio_set(PIOB, OLED_PIO3_IDX_MASK);      // Coloca 1 no pino LED
 				delay_ms(200);                        // Delay por software de 200 ms
 				pio_clear(PIOB, OLED_PIO3_IDX_MASK);    // Coloca 0 no pino do LED
