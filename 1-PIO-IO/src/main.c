@@ -168,15 +168,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				pio_set(PIOA, OLED_PIO1_IDX_MASK);      // Coloca 1 no pino LED
-<<<<<<< HEAD
-				delay_ms(200);                        // Delay por software de 200 ms
-				pio_clear(PIOA, OLED_PIO1_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(200); 		
-=======
 				delay_ms(500);                        // Delay por software de 200 ms
 				pio_clear(PIOA, OLED_PIO1_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(500); 		
->>>>>>> 46ebd9488dcca18ce82d1b652d93d8ec502a9bbc
+				delay_ms(500);
 				i++;		
 			}
 		}
@@ -185,15 +179,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				pio_set(PIOC, OLED_PIO2_IDX_MASK);      // Coloca 1 no pino LED
-<<<<<<< HEAD
-				delay_ms(200);                        // Delay por software de 200 ms
-				pio_clear(PIOC, OLED_PIO2_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(200); 		
-=======
 				delay_ms(500);                        // Delay por software de 200 ms
 				pio_clear(PIOC, OLED_PIO2_IDX_MASK);    // Coloca 0 no pino do LED
 				delay_ms(500); 		
->>>>>>> 46ebd9488dcca18ce82d1b652d93d8ec502a9bbc
 				i++;		
 			}
 		}
@@ -201,15 +189,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				pio_set(PIOB, OLED_PIO3_IDX_MASK);      // Coloca 1 no pino LED
-<<<<<<< HEAD
-				delay_ms(200);                        // Delay por software de 200 ms
-				pio_clear(PIOB, OLED_PIO3_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(200);
-=======
 				delay_ms(500);                        // Delay por software de 200 ms
 				pio_clear(PIOB, OLED_PIO3_IDX_MASK);    // Coloca 0 no pino do LED
 				delay_ms(500);
->>>>>>> 46ebd9488dcca18ce82d1b652d93d8ec502a9bbc
 				i++;
 			}
 		}
