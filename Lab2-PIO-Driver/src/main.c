@@ -221,6 +221,14 @@ uint32_t _pio_get(Pio *p_pio, const pio_type_t ul_type, const uint32_t ul_mask)
 	}
 }
 
+void _delay_ms(int delay){
+	int i = 0;
+	while (i<300000*delay){
+		asm("nop");
+		i++;
+	}
+}
+
 
 // Função de inicialização do uC
 void init(void)
@@ -291,9 +299,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				_pio_set(PIOC, LED_PIO_IDX_MASK);      // Coloca 1 no pino LED
-				delay_ms(200);                        // Delay por software de 200 ms
+				_delay_ms(200);                        // Delay por software de 200 ms
 				_pio_clear(PIOC, LED_PIO_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(200);
+				_delay_ms(200);
 				i++;
 			}
 		}
@@ -302,9 +310,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				_pio_set(PIOA, OLED_PIO1_IDX_MASK);      // Coloca 1 no pino LED
-				delay_ms(500);                        // Delay por software de 200 ms
+				_delay_ms(500);                        // Delay por software de 200 ms
 				_pio_clear(PIOA, OLED_PIO1_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(500); 		
+				_delay_ms(500); 		
 				i++;		
 			}
 		}
@@ -313,9 +321,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				_pio_set(PIOC, OLED_PIO2_IDX_MASK);      // Coloca 1 no pino LED
-				delay_ms(500);                        // Delay por software de 200 ms
+				_delay_ms(500);                        // Delay por software de 200 ms
 				_pio_clear(PIOC, OLED_PIO2_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(500); 		
+				_delay_ms(500); 		
 				i++;		
 			}
 		}
@@ -323,9 +331,9 @@ int main(void) {
 			int i = 0;
 			while (i < 5){
 				_pio_set(PIOB, OLED_PIO3_IDX_MASK);      // Coloca 1 no pino LED
-				delay_ms(500);                        // Delay por software de 200 ms
+				_delay_ms(500);                        // Delay por software de 200 ms
 				_pio_clear(PIOB, OLED_PIO3_IDX_MASK);    // Coloca 0 no pino do LED
-				delay_ms(500);
+				_delay_ms(500);
 				i++;
 			}
 		}
