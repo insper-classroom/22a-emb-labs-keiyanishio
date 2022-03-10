@@ -55,10 +55,9 @@ volatile char but_flag1_press = 0;
 volatile char but_flag1_up = 0;
 
 volatile char but_flag2_press = 0;
-volatile char but_flag2_up = 0;
 
 volatile char but_flag3_press = 0;
-volatile char but_flag3_up = 0;
+
 
 
 void but_callback (void) {
