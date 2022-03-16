@@ -78,8 +78,8 @@ void io_init(void)
 
 	// Configura led
 	
-	//pmc_enable_periph_clk(LED_PIO_ID);
-	//pio_configure(LED_PIO, PIO_OUTPUT_0, LED_IDX_MASK, PIO_DEFAULT);
+	pmc_enable_periph_clk(LED_PIO_ID);
+	pio_configure(LED_PIO, PIO_OUTPUT_0, LED_IDX_MASK, PIO_DEFAULT);
 	
 	//pmc_enable_periph_clk(OLED1_PIO_ID);
 	//pio_configure(OLED1_PIO, PIO_OUTPUT_0, OLED1_PIO_IDX_MASK, PIO_DEFAULT);
@@ -184,6 +184,18 @@ void TC1_Handler(void) {
 	pin_toggle(OLED1_PIO, OLED1_PIO_IDX_MASK);  
 }
 
+void TC2_Handler(void) {
+	/**
+	* Devemos indicar ao TC que a interrupção foi satisfeita.
+	* Isso é realizado pela leitura do status do periférico
+	**/
+	volatile uint32_t status = tc_get_status(TC0, 2);
+
+	/** Muda o estado do LED (pisca) **/
+	pin_toggle(LED_PIO, LED_IDX_MASK);  
+}
+
+
 void RTT_Handler(void) {
 	uint32_t ul_status;
 
@@ -279,6 +291,9 @@ void LED_init(int estado) {
 	pmc_enable_periph_clk(OLED3_PIO_ID);
 	pio_set_output(OLED3_PIO, OLED3_PIO_IDX_MASK, estado, 0, 0);
 	
+	pmc_enable_periph_clk(LED_PIO_ID);
+	pio_set_output(LED_PIO, LED_IDX_MASK, estado, 0, 0);
+	
 }
 
 /**
@@ -373,8 +388,12 @@ int main (void)
 	
 
 
-	TC_init(TC0, ID_TC1, 1, 5);
+	TC_init(TC0, ID_TC1, 1, 4);
 	tc_start(TC0, 1);
+	
+	TC_init(TC0, ID_TC2, 2, 5);
+	tc_start(TC0, 2);
+	
 	RTT_init(0.25, 1, RTT_MR_RTTINCIEN);   
   
 
