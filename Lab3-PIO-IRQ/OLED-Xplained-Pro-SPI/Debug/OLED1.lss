@@ -19,23 +19,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   7 .comment      00000059  00000000  00000000  000209fe  2**0
                   CONTENTS, READONLY
-  8 .debug_info   00016a0e  00000000  00000000  00020a57  2**0
+  8 .debug_info   000169ea  00000000  00000000  00020a57  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_abbrev 000030d1  00000000  00000000  00037465  2**0
+  9 .debug_abbrev 000030d1  00000000  00000000  00037441  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00005636  00000000  00000000  0003a536  2**0
+ 10 .debug_loc    00005636  00000000  00000000  0003a512  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_aranges 00000a40  00000000  00000000  0003fb6c  2**0
+ 11 .debug_aranges 00000a40  00000000  00000000  0003fb48  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000009c8  00000000  00000000  000405ac  2**0
+ 12 .debug_ranges 000009c8  00000000  00000000  00040588  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  00009ced  00000000  00000000  00040f74  2**0
+ 13 .debug_macro  00009ced  00000000  00000000  00040f50  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_line   0000ed7e  00000000  00000000  0004ac61  2**0
+ 14 .debug_line   0000ed7e  00000000  00000000  0004ac3d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_str    00090254  00000000  00000000  000599df  2**0
+ 15 .debug_str    0009023a  00000000  00000000  000599bb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_frame  0000348c  00000000  00000000  000e9c34  2**2
+ 16 .debug_frame  0000348c  00000000  00000000  000e9bf8  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -7564,7 +7564,7 @@ extern caddr_t _sbrk(int incr)
 00402e00 <but_callback>:
 
 volatile char but_flag3_press = 0;
-volatile char but_flag3_up = 0;
+
 
 
 void but_callback (void) {
