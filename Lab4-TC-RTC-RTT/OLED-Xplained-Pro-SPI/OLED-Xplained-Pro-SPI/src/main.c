@@ -56,12 +56,17 @@ static void RTT_init(float freqPrescale, uint32_t IrqNPulses, uint32_t rttIRQSou
 void RTC_init(Rtc *rtc, uint32_t id_rtc, calendar t, uint32_t irq_type);
 void pisca_led(int n, int t);
 
-volatile char but_flag3_press = 0;
-volatile char but_flag3_up = 0;
+volatile char but_flag1_press = 0;
+volatile char but_flag1_up = 0;
 volatile char flag_rtc_alarm = 0;
+volatile char flag_cronometro = 0;
+
+volatile int segundo = 0;
+volatile int minuto = 0;
+volatile int hora = 0;
 
 void but_callback1 (void) {
-	but_flag3_press= 1;
+	but_flag1_press= 1;
 }
 
 void io_init(void)
@@ -139,6 +144,15 @@ void TC2_Handler(void) {
 	pin_toggle(LED_PIO, LED_IDX_MASK);  
 }
 
+void TC0_Handler(void) {
+	/**
+	* Devemos indicar ao TC que a interrupção foi satisfeita.
+	* Isso é realizado pela leitura do status do periférico
+	**/
+	volatile uint32_t status = tc_get_status(TC0, 0);
+
+	flag_cronometro = 1;  
+}
 
 void RTT_Handler(void) {
 	uint32_t ul_status;
@@ -300,6 +314,55 @@ void RTC_init(Rtc *rtc, uint32_t id_rtc, calendar t, uint32_t irq_type) {
 	rtc_enable_interrupt(rtc,  irq_type);
 }
 
+void cronometro(){
+	segundo++;
+	if(segundo<10){
+		gfx_mono_draw_string("0", 80,0, &sysfont);
+	}
+	if(segundo>=10){
+		gfx_mono_draw_string(" ", 80,0, &sysfont);
+	}
+	
+	if(segundo == 60){
+		minuto++;
+		segundo = 0;
+		gfx_mono_draw_string(" ", 100,0, &sysfont);
+	}
+	
+	if(minuto<10){
+		gfx_mono_draw_string("0", 50,0, &sysfont);
+	}
+	if(minuto>=10){
+		gfx_mono_draw_string(" ", 50,0, &sysfont);
+	}
+	
+	if(minuto == 60){
+		hora++;
+		minuto = 0;
+		gfx_mono_draw_string(" ", 60,0, &sysfont);
+	}
+	
+	if(hora == 24){
+		hora = 0;
+		gfx_mono_draw_string(" ", 30,0, &sysfont);
+	}
+	char hora_str[5];
+	sprintf(hora_str, "%d", hora);
+	
+	char minuto_str[5];
+	sprintf(minuto_str, "%d", minuto);
+	
+	char segundo_str[5];
+	sprintf(segundo_str, "%d", segundo);
+
+	
+	gfx_mono_draw_string(hora_str, 20,0, &sysfont);
+	gfx_mono_draw_string(":", 40,0, &sysfont);
+	gfx_mono_draw_string(minuto_str, 60,0, &sysfont);
+	gfx_mono_draw_string(":", 70,0, &sysfont);
+	gfx_mono_draw_string(segundo_str, 90,0, &sysfont);
+}
+
 int main (void)
 {
 	board_init();
@@ -311,8 +374,8 @@ int main (void)
 	gfx_mono_ssd1306_init();
   
   
-	gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-  gfx_mono_draw_string("mundo", 50,16, &sysfont);
+	//gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
+  //gfx_mono_draw_string("mundo", 50,16, &sysfont);
 
 	/* Disable the watchdog */
 	WDT->WDT_MR = WDT_MR_WDDIS;
@@ -338,12 +401,20 @@ int main (void)
 	TC_init(TC0, ID_TC2, 2, 5);
 	tc_start(TC0, 2);
 	
+	TC_init(TC0, ID_TC0, 0, 1);
+	tc_start(TC0, 0);
+	
 	RTT_init(0.25, 1, RTT_MR_RTTINCIEN);   
   
 
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
-		if(but_flag3_press){
+		
+		if(flag_cronometro){
+			cronometro();
+			flag_cronometro = 0;
+		}
+		if(but_flag1_press){
 			uint32_t current_hour, current_min, current_sec;
 			uint32_t current_year, current_month, current_day, current_week;
 			rtc_get_time(RTC, &current_hour, &current_min, &current_sec);
@@ -362,7 +433,7 @@ int main (void)
 			
 			
 			
-			but_flag3_press = 0;
+			but_flag1_press = 0;
 			
 			
 		}
@@ -383,19 +454,7 @@ int main (void)
 
 			// Escreve na tela um circulo e um texto
 			
-		for(int i=70;i<=120;i+=2){
-				
-			gfx_mono_draw_rect(i, 5, 2, 10, GFX_PIXEL_SET);
-			delay_ms(10);
-				
-		}
-			
-		for(int i=120;i>=70;i-=2){
-				
-			gfx_mono_draw_rect(i, 5, 2, 10, GFX_PIXEL_CLR);
-			delay_ms(10);
-				
-		}
+		
 		
 		pmc_sleep(SAM_PM_SMODE_SLEEP_WFI);
 			
