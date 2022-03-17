@@ -410,10 +410,7 @@ int main (void)
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
 		
-		if(flag_cronometro){
-			cronometro();
-			flag_cronometro = 0;
-		}
+		
 		if(but_flag1_press){
 			uint32_t current_hour, current_min, current_sec;
 			uint32_t current_year, current_month, current_day, current_week;
@@ -442,6 +439,11 @@ int main (void)
 			flag_rtc_alarm = 0;
 			
 			
+		}
+		
+		if(flag_cronometro){
+			cronometro();
+			flag_cronometro = 0;
 		}
 		
 			
