@@ -316,25 +316,13 @@ void RTC_init(Rtc *rtc, uint32_t id_rtc, calendar t, uint32_t irq_type) {
 
 void cronometro(){
 	segundo++;
-	if(segundo<10){
-		gfx_mono_draw_string("0", 80,0, &sysfont);
-	}
-	if(segundo>=10){
-		gfx_mono_draw_string(" ", 80,0, &sysfont);
-	}
 	
 	if(segundo == 60){
 		minuto++;
 		segundo = 0;
-		gfx_mono_draw_string(" ", 100,0, &sysfont);
+		gfx_mono_draw_string(" ", 90,0, &sysfont);
 	}
 	
-	if(minuto<10){
-		gfx_mono_draw_string("0", 50,0, &sysfont);
-	}
-	if(minuto>=10){
-		gfx_mono_draw_string(" ", 50,0, &sysfont);
-	}
 	
 	if(minuto == 60){
 		hora++;
@@ -347,20 +335,20 @@ void cronometro(){
 		gfx_mono_draw_string(" ", 30,0, &sysfont);
 	}
 	char hora_str[5];
-	sprintf(hora_str, "%d", hora);
+	sprintf(hora_str, "%02d", hora);
 	
 	char minuto_str[5];
-	sprintf(minuto_str, "%d", minuto);
+	sprintf(minuto_str, "%02d", minuto);
 	
 	char segundo_str[5];
-	sprintf(segundo_str, "%d", segundo);
+	sprintf(segundo_str, "%02d", segundo);
 
 	
 	gfx_mono_draw_string(hora_str, 20,0, &sysfont);
 	gfx_mono_draw_string(":", 40,0, &sysfont);
-	gfx_mono_draw_string(minuto_str, 60,0, &sysfont);
+	gfx_mono_draw_string(minuto_str, 50,0, &sysfont);
 	gfx_mono_draw_string(":", 70,0, &sysfont);
-	gfx_mono_draw_string(segundo_str, 90,0, &sysfont);
+	gfx_mono_draw_string(segundo_str, 80,0, &sysfont);
 }
 
 int main (void)
