@@ -7,12 +7,12 @@
 
 
 // LED
-#define ECHO      PIOD
+#define ECHO_PIO      PIOD
 #define ECHO_ID   ID_PIOD
 #define ECHO_IDX      30
 #define ECHO_IDX_MASK (1 << ECHO_IDX)
 
-#define TRIGG       PIOC
+#define TRIGG_PIO      PIOC
 #define TRIGG_ID    ID_PIOC
 #define TRIGG_IDX   13
 #define TRIGG_IDX_MASK (1 << TRIGG_IDX)
@@ -29,32 +29,36 @@
 #define BUT_IDX  11
 #define BUT_IDX_MASK (1 << BUT_IDX)
 
+double tempo = 0;
+volatile char but_flag = 0;
+volatile char echo_flag = 0;
+volatile float freq = (float) 
 
 
 void io_init(void);
 void pisca_led(int n, int t);
 static void RTT_init(float freqPrescale, uint32_t IrqNPulses, uint32_t rttIRQSource);
 
-volatile char but_flag = 0;
-volatile char but_flag1_press = 0;
-volatile char but_flag1_up = 0;
+void but_callback{
+	but_flag = 1;
+};
 
-volatile char but_flag2_press = 0;
 
-volatile char but_flag3_press = 0;
 
 void callback_echo (void) {
+	if(echo_flag == 1){
+		tempo = rtt_read_timer_value(RTT);
+		echo_flag = 0;
+		
+	}
+	else if(echo_flag == 0) {
+		RTT_init(,,0);
+		echo_flag = 1;
+		
+	}
+	
 }
 
-void but_callback (void) {
-	if (pio_get(BUT_PIO, PIO_INPUT, BUT_PIO_IDX_MASK)) {
-		but_flag1_press = 0;
-		but_flag1_up = 1;
-		
-		} else {
-		but_flag1_press= 1;
-	}
-}
 
 void RTT_Handler(void) {
 	uint32_t ul_status;
@@ -64,12 +68,12 @@ void RTT_Handler(void) {
 
 	/* IRQ due to Alarm */
 	if ((ul_status & RTT_SR_ALMS) == RTT_SR_ALMS) {
-		RTT_init(4, 0, RTT_MR_RTTINCIEN);
+		//RTT_init(4, 0, RTT_MR_RTTINCIEN);
 	}
 	
 	/* IRQ due to Time has changed */
 	if ((ul_status & RTT_SR_RTTINC) == RTT_SR_RTTINC) {
-		pin_toggle(LED_PIO, LED_IDX_MASK);    // BLINK Led
+		//pin_toggle(LED_PIO, LED_IDX_MASK);    // BLINK Led
 	}
 
 }
@@ -119,73 +123,64 @@ static void RTT_init(float freqPrescale, uint32_t IrqNPulses, uint32_t rttIRQSou
 void io_init(void)
 {
 
-	// Configura led
 	
 	pmc_enable_periph_clk(ECHO_ID);
-	pio_configure(ECHO, PIO_OUTPUT_0, ECHO_IDX_MASK, PIO_DEFAULT);
-	pio_set_input(ECHO, ECHO_IDX_MASK, PIO_DEFAULT);
+	pio_configure(ECHO_PIO, PIO_OUTPUT_0, ECHO_IDX_MASK, PIO_DEFAULT);
+	pio_set_input(ECHO_PIO, ECHO_IDX_MASK, PIO_DEFAULT);
 	
 	pmc_enable_periph_clk(TRIGG_ID);
-	pio_configure(TRIGG, PIO_OUTPUT_0, TRIGG_IDX_MASK, PIO_DEFAULT);
-	pio_set_output(TRIGG, TRIGG_IDX_MASK, 0, 0, 0);
+	pio_configure(TRIGG_PIO, PIO_OUTPUT_0, TRIGG_IDX_MASK, PIO_DEFAULT);
+	pio_set_output(TRIGG_PIO, TRIGG_IDX_MASK, 0, 0, 0);
 	
 	
 	
 	
-	
-	
-
-	// Inicializa clock do periférico PIO responsavel pelo botao
 	pmc_enable_periph_clk(BUT_PIO_ID);
-	
 
-	// Configura PIO para lidar com o pino do botão como entrada
-	// com pull-up
 	pio_configure(BUT_PIO, PIO_INPUT, BUT_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
 	pio_set_debounce_filter(BUT_PIO, BUT_IDX_MASK, 60);
 	
 
-	// Configura interrupção no pino referente ao botao e associa
-	// função de callback caso uma interrupção for gerada
-	// a função de callback é a: but_callback()
-					
-	pio_handler_set(BUT_PIO,
-					BUT_PIO_ID,
-					BUT_IDX_MASK,
+	pio_handler_set(ECHO_PIO,
+					ECHO_ID,
+					ECHO_IDX_MASK,
 					PIO_IT_FALL_EDGE,
-					but_callback);
+					callback_echo);
 					
-
-
-	// Ativa interrupção e limpa primeira IRQ gerada na ativacao
-	pio_enable_interrupt(BUT1_PIO, BUT1_PIO_IDX_MASK);
-	pio_get_interrupt_status(BUT1_PIO);
+	
 	
 	pio_enable_interrupt(BUT_PIO, BUT_IDX_MASK);
 	pio_get_interrupt_status(BUT_PIO);
 	
-	pio_enable_interrupt(BUT2_PIO, BUT2_PIO_IDX_MASK);
-	pio_get_interrupt_status(BUT2_PIO);
+	pio_enable_interrupt(ECHO_PIO, ECHO_IDX_MASK);
+	pio_get_interrupt_status(ECHO_PIO);
 	
-	pio_enable_interrupt(BUT3_PIO, BUT3_PIO_IDX_MASK);
-	pio_get_interrupt_status(BUT3_PIO);
-	
-	
-	
-	
-	// Configura NVIC para receber interrupcoes do PIO do botao
-	// com prioridade 4 (quanto mais próximo de 0 maior)
-	NVIC_EnableIRQ(BUT1_PIO_ID);
-	NVIC_SetPriority(BUT1_PIO_ID, 4); // Prioridade 4
+	 
+	NVIC_EnableIRQ(ECHO_ID);
+	NVIC_SetPriority(ECHO_ID, 4); 
 	
 	NVIC_EnableIRQ(BUT_PIO_ID);
 	NVIC_SetPriority(BUT_PIO_ID, 4);
 	
-	NVIC_EnableIRQ(BUT2_PIO_ID);
-	NVIC_SetPriority(BUT2_PIO_ID, 4);
+}
+
+void delay_trigg(){
+	pio_set(TRIGG_PIO, TRIGG_IDX_MASK);
+	delay_us(10);
+	pio_clear(TRIGG_PIO, TRIGG_IDX_MASK);
 	
-	NVIC_EnableIRQ(BUT3_PIO_ID);
-	NVIC_SetPriority(BUT3_PIO_ID, 4);
+}
+
+void display(double tempo){
+	
+	double distancia = 340*tempo/2;
+	char str[5];
+	
+	sprintf(str, "%.4lf", distancia); //
+	gfx_mono_draw_string("distancia:", 0, 0, &sysfont);
+
+	gfx_mono_draw_string(str, 60, 0, &sysfont);
+	
 }
 
 int main (void)
