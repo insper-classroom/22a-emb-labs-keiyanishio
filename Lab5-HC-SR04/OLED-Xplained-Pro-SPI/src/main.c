@@ -6,21 +6,18 @@
 
 
 
-// LED
-#define ECHO_PIO      PIOD
-#define ECHO_ID   ID_PIOD
-#define ECHO_IDX      30
+//ECHO E TRIGGER
+#define ECHO_PIO      PIOA
+#define ECHO_ID   ID_PIOA
+#define ECHO_IDX      6
 #define ECHO_IDX_MASK (1 << ECHO_IDX)
 
-#define TRIGG_PIO      PIOC
-#define TRIGG_ID    ID_PIOC
-#define TRIGG_IDX   13
+#define TRIGG_PIO      PIOD
+#define TRIGG_ID    ID_PIOD
+#define TRIGG_IDX   30
 #define TRIGG_IDX_MASK (1 << TRIGG_IDX)
 
-#define LED_PIO      PIOC
-#define LED_PIO_ID   ID_PIOC
-#define LED_IDX      8
-#define LED_IDX_MASK (1 << LED_IDX)
+
 
 
 // Botão
@@ -29,35 +26,44 @@
 #define BUT_IDX  11
 #define BUT_IDX_MASK (1 << BUT_IDX)
 
-double tempo = 0;
+//Variáveis
+volatile int tempo = 0;
 volatile char but_flag = 0;
 volatile char echo_flag = 0;
-volatile float freq = (float) 
+volatile double freq = 1/(2*0.000058);
+volatile char display_flag = 0;
+
 
 
 void io_init(void);
-void pisca_led(int n, int t);
 static void RTT_init(float freqPrescale, uint32_t IrqNPulses, uint32_t rttIRQSource);
 
-void but_callback{
+void but_callback(void){
 	but_flag = 1;
-};
-
+}
 
 
 void callback_echo (void) {
-	if(echo_flag == 1){
+	
+	if(!echo_flag) {
+		
+		RTT_init(freq,0,0);
+		echo_flag = 1;
+		
+	
+	}
+	else{
 		tempo = rtt_read_timer_value(RTT);
 		echo_flag = 0;
+		display_flag = 1;
 		
-	}
-	else if(echo_flag == 0) {
-		RTT_init(,,0);
-		echo_flag = 1;
+		 
 		
 	}
 	
 }
+
+
 
 
 void RTT_Handler(void) {
@@ -66,24 +72,11 @@ void RTT_Handler(void) {
 	/* Get RTT status - ACK */
 	ul_status = rtt_get_status(RTT);
 
-	/* IRQ due to Alarm */
-	if ((ul_status & RTT_SR_ALMS) == RTT_SR_ALMS) {
-		//RTT_init(4, 0, RTT_MR_RTTINCIEN);
-	}
 	
-	/* IRQ due to Time has changed */
-	if ((ul_status & RTT_SR_RTTINC) == RTT_SR_RTTINC) {
-		//pin_toggle(LED_PIO, LED_IDX_MASK);    // BLINK Led
-	}
 
 }
 
-void pin_toggle(Pio *pio, uint32_t mask){
-	if(pio_get_output_data_status(pio, mask))
-	pio_clear(pio, mask);
-	else
-	pio_set(pio,mask);
-}
+
 
 static float get_time_rtt(){
 	uint ul_previous_time = rtt_read_timer_value(RTT);
@@ -130,7 +123,7 @@ void io_init(void)
 	
 	pmc_enable_periph_clk(TRIGG_ID);
 	pio_configure(TRIGG_PIO, PIO_OUTPUT_0, TRIGG_IDX_MASK, PIO_DEFAULT);
-	pio_set_output(TRIGG_PIO, TRIGG_IDX_MASK, 0, 0, 0);
+	//pio_set_output(TRIGG_PIO, TRIGG_IDX_MASK, 0, 0, 0);
 	
 	
 	
@@ -144,8 +137,14 @@ void io_init(void)
 	pio_handler_set(ECHO_PIO,
 					ECHO_ID,
 					ECHO_IDX_MASK,
-					PIO_IT_FALL_EDGE,
+					PIO_IT_EDGE,
 					callback_echo);
+					
+	pio_handler_set(BUT_PIO,
+					BUT_PIO_ID,
+					BUT_IDX_MASK,
+					PIO_IT_FALL_EDGE,
+					but_callback);
 					
 	
 	
@@ -157,10 +156,10 @@ void io_init(void)
 	
 	 
 	NVIC_EnableIRQ(ECHO_ID);
-	NVIC_SetPriority(ECHO_ID, 4); 
+	NVIC_SetPriority(ECHO_ID, 1); 
 	
 	NVIC_EnableIRQ(BUT_PIO_ID);
-	NVIC_SetPriority(BUT_PIO_ID, 4);
+	NVIC_SetPriority(BUT_PIO_ID, 2);
 	
 }
 
@@ -171,17 +170,23 @@ void delay_trigg(){
 	
 }
 
-void display(double tempo){
-	
-	double distancia = 340*tempo/2;
+void display(){
 	char str[5];
+	double tempo2 = tempo/freq;
 	
-	sprintf(str, "%.4lf", distancia); //
-	gfx_mono_draw_string("distancia:", 0, 0, &sysfont);
-
-	gfx_mono_draw_string(str, 60, 0, &sysfont);
+	double distancia = ((320.0*tempo2)/2.0)*100.0;
+	gfx_mono_draw_string("    ", 10,8, &sysfont);
+	gfx_mono_draw_string("    ", 70,8, &sysfont);
+	sprintf(str, "%.1f", distancia); //
+	gfx_mono_draw_string("dist:", 10,8, &sysfont);
+	
+	
+	gfx_mono_draw_string(str, 70,8, &sysfont);
 	
 }
+
+
+
 
 int main (void)
 {
@@ -190,9 +195,7 @@ int main (void)
 	io_init();
 	delay_init();
 	
-	
-	
-	
+
 	
   // Init OLED
 	gfx_mono_ssd1306_init();
@@ -204,6 +207,18 @@ int main (void)
 
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
+		
+		if(but_flag){
+			delay_trigg();
+			but_flag = 0;
+		}
+		
+		if(display_flag){
+			display();
+			display_flag = 0;
+			
+		}
+		
 		
 		
 				
