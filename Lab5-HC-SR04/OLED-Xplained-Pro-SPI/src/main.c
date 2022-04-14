@@ -175,8 +175,8 @@ void display(){
 	double tempo2 = tempo/freq;
 	
 	double distancia = ((320.0*tempo2)/2.0)*100.0;
-	gfx_mono_draw_string("    ", 10,8, &sysfont);
-	gfx_mono_draw_string("    ", 70,8, &sysfont);
+	gfx_mono_draw_string("       ", 10,8, &sysfont);
+	gfx_mono_draw_string("        ", 70,8, &sysfont);
 	sprintf(str, "%.1f", distancia); //
 	gfx_mono_draw_string("dist:", 10,8, &sysfont);
 	
