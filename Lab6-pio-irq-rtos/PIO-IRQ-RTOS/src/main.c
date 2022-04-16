@@ -50,9 +50,11 @@ extern void xPortSysTickHandler(void);
 
 /** Semaforo a ser usado pela task led */
 SemaphoreHandle_t xSemaphoreBut;
+SemaphoreHandle_t xSemaphoreBut1;
 
 /** Queue for msg log send data */
 QueueHandle_t xQueueLedFreq;
+QueueHandle_t xQueueLedFreq1;
 
 /************************************************************************/
 /* prototypes local                                                     */
@@ -114,7 +116,7 @@ void but_callback(void) {
 
 void but_callback1(void) {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(xSemaphoreBut, &xHigherPriorityTaskWoken);
+	xSemaphoreGiveFromISR(xSemaphoreBut1, &xHigherPriorityTaskWoken);
 }
 
 /************************************************************************/
@@ -167,10 +169,17 @@ static void task_but(void *pvParameters) {
       printf("task_but: %d \n", delayTicks);
 
       /* garante range da freq. */
-      if (delayTicks == 2100) {
+      if (delayTicks == 100) {
         delayTicks = 900;
       }
     }
+	if(xSemaphoreTake(xSemaphoreBut1, 1000)){
+		delayTicks += 100;
+		xQueueSend(xQueueLedFreq, (void *)&delayTicks, 10);
+		
+		printf("task_but: %d \n", delayTicks);
+	}
+	
   }
 }
 
@@ -266,12 +275,20 @@ int main(void) {
   xSemaphoreBut = xSemaphoreCreateBinary();
   if (xSemaphoreBut == NULL)
     printf("falha em criar o semaforo \n");
+  
+  xSemaphoreBut1 = xSemaphoreCreateBinary();
+  if (xSemaphoreBut1 == NULL)
+	printf("falha em criar o semaforo \n"); 
 
   /* cria queue com 32 "espacos" */
   /* cada espaço possui o tamanho de um inteiro*/
   xQueueLedFreq = xQueueCreate(32, sizeof(uint32_t));
   if (xQueueLedFreq == NULL)
     printf("falha em criar a queue \n");
+  
+  xQueueLedFreq1 = xQueueCreate(32, sizeof(uint32_t));
+  if (xQueueLedFreq1 == NULL)
+	printf("falha em criar a queue \n");
 
   /* Create task to make led blink */
   if (xTaskCreate(task_led, "Led", TASK_LED_STACK_SIZE, NULL,
