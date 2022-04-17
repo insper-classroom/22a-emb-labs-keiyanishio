@@ -250,7 +250,7 @@ int main(void) {
 
   xQueuePROC = xQueueCreate(100, sizeof(adcData));
   if (xQueuePROC == NULL)
-  printf("falha em criar a queue xQueueADC \n");
+  printf("falha em criar a queue xQueuePROC \n");
 
   if (xTaskCreate(task_adc, "ADC", TASK_ADC_STACK_SIZE, NULL,
                   TASK_ADC_STACK_PRIORITY, NULL) != pdPASS) {
@@ -259,7 +259,7 @@ int main(void) {
 
   if (xTaskCreate(task_proc, "PROC", TASK_ADC_STACK_SIZE, NULL,
 				  TASK_ADC_STACK_PRIORITY, NULL) != pdPASS) {
-	  printf("Failed to create test ADC task\r\n");
+	  printf("Failed to create test PROC task\r\n");
   }
 
   vTaskStartScheduler();
