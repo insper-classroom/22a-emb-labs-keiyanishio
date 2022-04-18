@@ -175,7 +175,7 @@ static void task_but(void *pvParameters) {
     }
 	if(xSemaphoreTake(xSemaphoreBut1, 1000)){
 		delayTicks += 100;
-		xQueueSend(xQueueLedFreq, (void *)&delayTicks, 10);
+		xQueueSend(xQueueLedFreq1, (void *)&delayTicks, 10);
 		
 		printf("task_but: %d \n", delayTicks);
 	}
