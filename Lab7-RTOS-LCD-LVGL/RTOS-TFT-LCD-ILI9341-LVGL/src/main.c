@@ -9,6 +9,7 @@
 #include "touch/touch.h"
 #include "pslogo.h"
 #include "mercedes.h"
+#include "relogio.h"
 
 
 /************************************************************************/
@@ -45,6 +46,7 @@ static lv_obj_t * labelClock;
 static lv_obj_t * labelSetValue;
 static lv_obj_t * labelPonto4;
 static lv_obj_t * labelData;
+static lv_obj_t * labelCelsius;
 
 
 
@@ -281,7 +283,7 @@ void lv_termostato(void) {
 		 lv_obj_add_style(btnclock, &style, 0);
 
 		 labelRelo = lv_label_create(btnclock);
-		 lv_label_set_text(labelRelo, LV_SYMBOL_SETTINGS "  ]");
+		 lv_label_set_text(labelRelo, "    ]");
 		 lv_obj_center(labelRelo);
 		 
 		 
@@ -345,7 +347,7 @@ void lv_termostato(void) {
 		lv_obj_align(labelClock, LV_ALIGN_TOP_RIGHT, 0, 0);
 		lv_obj_set_style_text_font(labelClock, &dseg25, LV_STATE_DEFAULT);
 		lv_obj_set_style_text_color(labelClock, lv_color_white(), LV_STATE_DEFAULT);
-		lv_label_set_text_fmt(labelClock, "%02d:%02d", 17, 46);
+		lv_label_set_text_fmt(labelClock, "%02d:%02d", 0, 0);
 		
 		
 		/////////////////SET VALUE///////////////////
@@ -361,6 +363,25 @@ void lv_termostato(void) {
 		lv_obj_set_style_text_font(labelData, &dseg15, LV_STATE_DEFAULT);
 		lv_obj_set_style_text_color(labelData, lv_color_white(), LV_STATE_DEFAULT);
 		lv_label_set_text_fmt(labelData, "%02d/%02d/%02d", 14, 05, 2022);
+		
+		
+		///////////CELSIUS/////////////////////
+		
+		lv_style_init(&style);
+		lv_style_set_bg_color(&style, lv_color_black());
+		lv_style_set_border_width(&style, 5);
+
+		lv_obj_t * celsius = lv_btn_create(lv_scr_act());
+		lv_obj_add_event_cb(celsius, event_handler, LV_EVENT_ALL, NULL);
+		lv_obj_align_to(celsius, labelSetValue, LV_ALIGN_LEFT_MID, -80, -30);
+		lv_obj_add_style(celsius, &style, 0);
+
+		labelCelsius = lv_label_create(celsius);
+		lv_label_set_text(labelCelsius, "°C");
+		
+		
+		
+		
 		
 		
 		
@@ -382,9 +403,19 @@ static void task_lcd(void *pvParameters) {
 	lv_obj_t * img2 = lv_img_create(lv_scr_act());
 	lv_img_set_src(img2, &mercedes);
 	lv_obj_align_to(img2, img,  LV_ALIGN_RIGHT_MID, 30, 0);
-
-
+	
+	
+	
 	lv_termostato();
+	
+	lv_obj_t * img3 = lv_img_create(lv_scr_act());
+	lv_img_set_src(img3, &relogio);
+	lv_obj_align(img3,  LV_ALIGN_BOTTOM_LEFT, 110, -5);
+	
+	
+
+
+	
 
 	for (;;)  {
 		lv_tick_inc(50);
